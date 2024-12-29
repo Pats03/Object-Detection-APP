@@ -10,10 +10,12 @@ const Attendance = () => {
   const [cctvUrl, setCctvUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Track loading state
   const [predictedCount, setPredictedCount] = useState(null); // Track predicted count
+    const [uploadedImages1, setUploadedImages1] = useState([]);
 
   // Handle image upload
   const handleUpload = (event) => {
     const files = Array.from(event.target.files);
+    setUploadedImages1((prevImages) => [...prevImages, ...files]);
     const imagePreviews = files.map((file) => URL.createObjectURL(file));
     setUploadedImages((prevImages) => [...prevImages, ...imagePreviews]);
   };
@@ -68,97 +70,49 @@ const Attendance = () => {
   const handleDeleteImage = (index) => {
     setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
-  const handlesubmitImage = async (index) => {
-    setIsLoading(true); // Start loading state
-    setPredictedCount(null); // Reset predicted count
+const blobToFormData = (blob, index) => {
+  const formData = new FormData();
+  formData.append('image', blob, `image_${index + 1}.jpg`); // Attach the image Blob with a name
+  return formData;
+};
 
-    try {
-      // Step 1: Retrieve the image blob from uploadedImages
-      const imageBlob = uploadedImages[index];
-      if (!imageBlob) throw new Error('No image found at the specified index.');
+const handlesubmitImage = async (index) => {
+  setIsLoading(true); // Start loading state
+  setPredictedCount(null); // Reset predicted count
 
-      // Step 2: Convert the image Blob to Base64 format
-      const base64Image = await blobToBase64(imageBlob);
-      if (!base64Image || base64Image.trim().length === 0) {
-        throw new Error('Base64 image data is empty or invalid.');
-      }
+  try {
+    // Step 1: Retrieve the image blob from uploadedImages1
+    const imageBlob = uploadedImages1[index];
+    if (!imageBlob) throw new Error('No image found at the specified index.');
 
-      // Step 3: Prepare API parameters for ImgBB
-      const formData = new FormData();
-      formData.append('key', '8d9de38f1ae006a26ea26d82f97082b0'); // Replace with your ImgBB API key
-      formData.append('image', base64Image); // Add the Base64 image data
-      formData.append('name', `image_${index + 1}.jpg`); // Optionally name the image
+    // Step 2: Convert the Blob to FormData
+    const formData = blobToFormData(imageBlob, index);
 
-      // Step 4: Upload the image to ImgBB
-      const hostingResponse = await axios.post(
-        'https://api.imgbb.com/1/upload',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      // Extract the hosted image URL from the response
-      const { data } = hostingResponse;
-      if (!data || !data.data || !data.data.url) {
-        throw new Error('Failed to retrieve hosted image URL from ImgBB.');
-      }
-
-      const hostedImageUrl = data.data.url;
-      console.log('Hosted Image URL:', hostedImageUrl);
-
-      // Step 5: Send the hosted image URL to your backend
-      const backendResponse = await axios.post(
-        'http://127.0.0.1:5173/model/predict',
-        {
-          image_url: hostedImageUrl,
+    // Step 3: Send the image directly to your backend
+    const backendResponse = await axios.post(
+      'http://127.0.0.1:5173/model/predict', // Replace with your backend API endpoint
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': true, // Skip browser warnings if using ngrok
-          },
-        }
-      );
+      }
+    );
 
-      // Log and display the backend response
-      console.log('Backend Response:', backendResponse.data);
-      setPredictedCount(backendResponse.data.predicted_count);
-    } catch (error) {
-      // Handle errors gracefully
-      console.error(
-        'Error submitting image:',
-        error.response ? error.response.data : error.message
-      );
-      alert('Failed to submit the image. Please try again.');
-    } finally {
-      setIsLoading(false); // Stop loading state
-    }
-  };
-
-  // Function to convert Blob to Base64
-  const blobToBase64 = (blobUrl) => {
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', blobUrl, true);
-      xhr.responseType = 'blob';
-
-      xhr.onload = () => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          // The result is the Base64 data URL
-          resolve(reader.result.split(',')[1]); // Extract Base64 part
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(xhr.response); // Convert Blob to Base64
-      };
-
-      xhr.onerror = reject;
-      xhr.send();
-    });
-  };
+    // Log and display the backend response
+    console.log('Backend Response:', backendResponse.data);
+    setPredictedCount(backendResponse.data.predicted_count);
+  } catch (error) {
+    // Handle errors gracefully
+    console.error(
+      'Error submitting image:',
+      error.response ? error.response.data : error.message
+    );
+    alert('Failed to submit the image. Please try again.');
+  } finally {
+    setIsLoading(false); // Stop loading state
+  }
+};
 
   // Load sample images
   const handleLoadSampleImages = () => {
