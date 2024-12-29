@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { FaHome, FaCogs, FaQuestionCircle, FaInfoCircle } from 'react-icons/fa'; // Importing icons
 import './Navbar.css';
 import ImageGallery from '../components/ImageGallery';
+import logo from '../assets/nethra-white.png'
+import cctv from '../assets/cctv.png'
 import Service from '../components/Services';
 import FAQ from '../components/Faq';
 import Footer from '../components/Foooter';
@@ -9,17 +11,21 @@ import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  
   // Function to toggle the sidebar state
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-  const loginAction =()=>{
+
+  const loginAction = () => {
     navigate('/login');
-  }
+  };
+
   const signupAction = () => {
     navigate('/signup');
   };
+
   // Scroll function for the sidebar links
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
@@ -27,6 +33,15 @@ const Home = () => {
       section.scrollIntoView({ behavior: 'smooth' });
     }
     setIsSidebarOpen(false); // Close sidebar after clicking
+  };
+
+  // Navigation functions for the new buttons
+  const goToSinglePic = () => {
+    navigate('/singlepic');
+  };
+
+  const goToDoublePic = () => {
+    navigate('/doublepic');
   };
 
   return (
@@ -37,18 +52,16 @@ const Home = () => {
           <button className="menu-button" onClick={toggleSidebar}>
             ☰
           </button>
-          <div className="logo">
-            astica <span>ai</span>
-          </div>
+          <img src={logo} alt="logo" style={{ width: '225px', height: '65px' }} />
         </div>
-        <div className="navbar-right">
-          <button onClick={signupAction}>Sign Up</button>
-          <button onClick={loginAction}>Log In</button>
+        <div className="grid grid-cols-2 justify-center items-center gap-4">
+          <button onClick={signupAction} className='bg-transparent border border-white rounded hover:scale-105 hover:text-[#0e1a27] hover:bg-white hover:border-[#0e1a27] hover:font-bold p-2'>Sign Up</button>
+          <button onClick={loginAction} className='hover:bg-transparent hover:text-white border hover:border-white rounded hover:scale-105 text-[#0e1a27] bg-white border-[#0e1a27] font-bold p-2'>Log In</button>
         </div>
       </nav>
 
       {/* Sidebar */}
-      <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+      <div className={`mt-5 sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <ul className="sidebar-links">
           <li onClick={() => scrollToSection('home')}>
             <FaHome size={20} className="sidebar-icon" /> Home
@@ -75,25 +88,11 @@ const Home = () => {
           padding: '20px',
         }}
       >
-        <div
-          className="hello-world"
-          style={{ textAlign: 'center', marginTop: '-50px' }}
-        >
-          <div className="logo">
-            <img
-              src="/logo3.webp" // Replace with your logo URL
-              alt="Astica Logo"
-              style={{ width: '50px' }}
-            />
-          </div>
-          <h1>Hello, world!</h1>
-          <p>
-            Welcome to <strong>astica ai</strong>. Discover our Object detection
-            capability
-          </p>
-        </div>
-        {/* Image Gallery moved here */}
+        <p className={`typing-effect ${isSidebarOpen ? 'text-3xl ml-60' : ''} transition-all duration-300`} style={{marginTop: '-140px'}}>
+          <span className="vibrant-text">N</span>eural <span className="vibrant-text">E</span>ngine for <span className="vibrant-text">T</span>racking <span className="vibrant-text">H</span>umans and <span className="vibrant-text">R</span>ecording <span className="vibrant-text">A</span>ttendance
+        </p>
       </div>
+
       <div
         id="Image"
         className="section"
@@ -101,15 +100,39 @@ const Home = () => {
           height: '10vh',
           padding: '20px',
           transition: 'margin-left 0.3s ease', // Smooth transition
-          marginLeft: isSidebarOpen ? '220px' : '0', // Dynamically adjust margin based on sidebar state
+          marginLeft: isSidebarOpen ? '220px' : '0',
+          marginTop: '-120px' // Dynamically adjust margin based on sidebar state
         }}
       >
         <ImageGallery />
+        
       </div>
+      <div
+        id="image-buttons"
+        className=""
+        style={{ padding: '', textAlign: 'center', marginTop: '200px' }}
+      >
+        <button
+          onClick={goToSinglePic}
+          className="bg-transparent border text-white border-white rounded hover:scale-105 hover:text-[#0e1a27] hover:bg-white hover:border-[#0e1a27] hover:font-bold p-4 mb-0"
+        >
+          Try with Single Image
+        </button>
+        <br /> <br/>
+        <button
+          onClick={goToDoublePic}
+          className="bg-transparent border text-white border-white rounded hover:scale-105 hover:text-[#0e1a27] hover:bg-white hover:border-[#0e1a27] hover:font-bold p-4"
+        >
+          Try with Two Pictures
+        </button>
+      </div> 
+
+      
+
       <div
         id="services"
         className="section"
-        style={{ height: '100vh', padding: '10px' }}
+        style={{ height: '100vh', padding: '10px', marginTop: '-200px' }}
       >
         <Service />
       </div>
@@ -117,10 +140,11 @@ const Home = () => {
       <div
         id="FAQ"
         className="section"
-        style={{ height: '60vh', padding: '20px' }}
+        style={{ height: '60vh', padding: '20px', marginTop: '-50px' }}
       >
         <FAQ />
       </div>
+
       <Footer />
     </div>
   );
