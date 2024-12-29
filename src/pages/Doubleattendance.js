@@ -1,19 +1,25 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import img1 from '../assets/img4.jpeg';
+import img1 from '../assets/img13.jpg';
+import img2 from '../assets/img14.jpg';
+import img3 from '../assets/img15.jpg';
+import img4 from '../assets/img16.jpg';
 
-const Attendance = () => {
+const Doubleattendance = () => {
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [uploadedImages1, setUploadedImages1] = useState([]);
   const [sampleImages, setSampleImages] = useState([]);
   const videoRef = useRef(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [cctvUrl, setCctvUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Track loading state
   const [predictedCount, setPredictedCount] = useState(null); // Track predicted count
+  const [stitchedImage, setStitchedImage] = useState(null);
 
   // Handle image upload
   const handleUpload = (event) => {
     const files = Array.from(event.target.files);
+    setUploadedImages1((prevImages) => [...prevImages, ...files]);
     const imagePreviews = files.map((file) => URL.createObjectURL(file));
     setUploadedImages((prevImages) => [...prevImages, ...imagePreviews]);
   };
@@ -68,73 +74,26 @@ const Attendance = () => {
   const handleDeleteImage = (index) => {
     setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
-  const handlesubmitImage = async (index) => {
-    setIsLoading(true); // Start loading state
-    setPredictedCount(null); // Reset predicted count
-
+  const handlePredict = async () => {
     try {
-      // Step 1: Retrieve the image blob from uploadedImages
-      const imageBlob = uploadedImages[index];
-      if (!imageBlob) throw new Error('No image found at the specified index.');
-
-      // Step 2: Convert the image Blob to Base64 format
-      const base64Image = await blobToBase64(imageBlob);
-      if (!base64Image || base64Image.trim().length === 0) {
-        throw new Error('Base64 image data is empty or invalid.');
-      }
-
-      // Step 3: Prepare API parameters for ImgBB
-      const formData = new FormData();
-      formData.append('key', '8d9de38f1ae006a26ea26d82f97082b0'); // Replace with your ImgBB API key
-      formData.append('image', base64Image); // Add the Base64 image data
-      formData.append('name', `image_${index + 1}.jpg`); // Optionally name the image
-
-      // Step 4: Upload the image to ImgBB
-      const hostingResponse = await axios.post(
-        'https://api.imgbb.com/1/upload',
-        formData,
+      // Send the stitched image URL to the predict route
+      
+      setIsLoading(true);
+      const predictionResponse = await axios.post(
+        'http://127.0.0.1:5173/predict',
         {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+          url: stitchedImage,
         }
       );
 
-      // Extract the hosted image URL from the response
-      const { data } = hostingResponse;
-      if (!data || !data.data || !data.data.url) {
-        throw new Error('Failed to retrieve hosted image URL from ImgBB.');
-      }
-
-      const hostedImageUrl = data.data.url;
-      console.log('Hosted Image URL:', hostedImageUrl);
-
-      // Step 5: Send the hosted image URL to your backend
-      const backendResponse = await axios.post(
-        'http://127.0.0.1:5173/model/predict',
-        {
-          image_url: hostedImageUrl,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': true, // Skip browser warnings if using ngrok
-          },
-        }
-      );
-
-      // Log and display the backend response
-      console.log('Backend Response:', backendResponse.data);
-      setPredictedCount(backendResponse.data.predicted_count);
+      // Set the prediction state
+      
+    setIsLoading(false);
+      setPredictedCount(predictionResponse.data);
     } catch (error) {
-      // Handle errors gracefully
-      console.error(
-        'Error submitting image:',
-        error.response ? error.response.data : error.message
-      );
-      alert('Failed to submit the image. Please try again.');
-    } finally {
-      setIsLoading(false); // Stop loading state
+        
+     setIsLoading(false);
+      console.error('Error predicting count:', error);
     }
   };
 
@@ -162,7 +121,7 @@ const Attendance = () => {
 
   // Load sample images
   const handleLoadSampleImages = () => {
-    const exampleImages = [img1];
+    const exampleImages = [img1, img2, img3, img4];
     setSampleImages(exampleImages);
   };
 
@@ -206,6 +165,37 @@ const Attendance = () => {
       );
     }
   };
+  const handleStitch = async () => {
+    if (uploadedImages1.length !== 2) {
+      console.error('Exactly two images are required to stitch.');
+      return;
+    }
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append('image1', uploadedImages1[0]);
+    formData.append('image2', uploadedImages1[1]);
+
+    try {
+      const response = await axios.post(
+        'http://127.0.0.1:5173/image/stitch',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
+      console.log(response.data);
+
+      // Store the stitched image URL from the response
+      setStitchedImage(response.data.image_url);
+      
+     setIsLoading(false);
+      setUploadedImages([]);
+
+    } catch (error) {
+      console.error('Error stitching images:', error);
+    }
+  };
   const handleDownload = () => {
     const content = `
     <h2>Atica AI Predictions</h2>
@@ -221,7 +211,7 @@ const Attendance = () => {
         <tr>
           <td style="padding: 10px;">Image1.jpg</td>
           <td style="padding: 10px;">${new Date().toLocaleString()}</td>
-          <td style="padding: 10px;">${predictedCount}</td>
+          <td style="padding: 10px;">${predictedCount.originals}</td>
         </tr>
         <!-- Add more rows as needed for other images -->
       </tbody>
@@ -240,6 +230,7 @@ const Attendance = () => {
     // Clean up
     URL.revokeObjectURL(url);
   };
+
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
@@ -281,11 +272,10 @@ const Attendance = () => {
             image, select a directory, take a photo, or fetch an image from a
             CCTV URL.
           </p>
-
           {/* Upload Buttons */}
           <div className="flex gap-4 mb-6">
             <label className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded text-white cursor-pointer">
-              + Upload Image(s)
+              + Upload Image 1
               <input
                 type="file"
                 accept="image/*"
@@ -295,24 +285,22 @@ const Attendance = () => {
               />
             </label>
             <label className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-white cursor-pointer">
-              Upload Directory
+              + Upload Image 2
               <input
                 type="file"
                 accept="image/*"
                 multiple
-                webkitdirectory="true"
-                onChange={handleUploadDirectory}
+                onChange={handleUpload}
                 className="hidden"
               />
             </label>
           </div>
-
           {/* CCTV URL Input */}
           <div className="flex gap-4 mb-6">
             <input
               type="text"
               className="flex-1 px-4 py-2 rounded bg-gray-700 text-white"
-              placeholder="Enter CCTV URL..."
+              placeholder="Enter CCTV URL... 1"
               value={cctvUrl}
               onChange={(e) => setCctvUrl(e.target.value)}
             />
@@ -323,7 +311,21 @@ const Attendance = () => {
               Fetch Image
             </button>
           </div>
-
+          <div className="flex gap-4 mb-6">
+            <input
+              type="text"
+              className="flex-1 px-4 py-2 rounded bg-gray-700 text-white"
+              placeholder="Enter CCTV URL... 2"
+              value={cctvUrl}
+              onChange={(e) => setCctvUrl(e.target.value)}
+            />
+            <button
+              className="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded text-white"
+              onClick={handleCCTVUrl}
+            >
+              Fetch Image
+            </button>
+          </div>
           {/* Photo and Actions Table */}
           <div className="bg-gray-700 p-4 rounded-lg">
             <div className="flex justify-between items-center mb-4">
@@ -339,50 +341,94 @@ const Attendance = () => {
                       alt={`Uploaded Preview ${index + 1}`}
                       className="w-full rounded-lg"
                     />
-                    <div className="flex gap-4 mt-2">
-                      {isLoading ? (
-                        <div className="spinner-border animate-spin w-6 h-6 border-4 border-t-4 border-white rounded-full"></div>
-                      ) : (
-                        <>
-                          <button
-                            className="bg-red-600 hover:bg-red-500 px-4 py-2 mt-2 rounded text-white"
-                            onClick={() => handleDeleteImage(index)}
-                          >
-                            Delete
-                          </button>
-                          <button
-                            className="bg-blue-600 hover:bg-blue-500 px-4 py-2 mt-2 rounded text-white"
-                            onClick={() => handlesubmitImage(index)}
-                          >
-                            Submit
-                          </button>
-                        </>
-                      )}
+                    <div className="flex gap-4 mt-2 justify-center">
+                      <button
+                        className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded text-white"
+                        onClick={() => handleDeleteImage(index)}
+                      >
+                        Delete
+                      </button>
                     </div>
-
-                    {predictedCount !== null && !isLoading && (
-                      <div className="mt-4 text-center">
-                        <p className="text-xl font-semibold text-green-500">
-                          Predicted Count: {predictedCount}
-                        </p>
-                        <button
-                          onClick={handleDownload}
-                          className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
-                        >
-                          Download Predictions
-                        </button>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-400 border border-dashed border-gray-500 rounded">
-                Click to add a photo to astica Vision AI
+              <p className="text-center text-gray-300">
+                {stitchedImage
+                  ? 'Stitched image uploaded.'
+                  : 'No images uploaded yet.'}
+              </p>
+            )}
+            {uploadedImages.length === 2 && (
+              <div className="mt-4 text-center">
+                <button
+                  className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded text-white"
+                  onClick={handleStitch}
+                >
+                  Stitch Images
+                </button>
+              </div>
+            )}
+            {stitchedImage && (
+              <div className="mt-6 text-center">
+                <img
+                  src={stitchedImage}
+                  alt="Stitched Result"
+                  className="w-full max-w-md mx-auto rounded-lg"
+                />
+                <button
+                  className="bg-blue-600 hover:bg-blue-500 px-4 py-2 mt-4 rounded text-white"
+                  onClick={handlePredict}
+                >
+                  Predict
+                </button>
+              </div>
+            )}
+
+            {predictedCount !== null && !isLoading && (
+              <div className="mt-4 text-center">
+                <p className="text-2xl font-semibold text-green-500">
+                  Predicted Count
+                </p>
+                <ul className="mt-2 space-y-2 text-lg text-red-700 list-disc pl-5">
+                  <li className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600">
+                      Total:
+                      <span className="font-medium text-orange-600">
+                        {predictedCount.total}
+                      </span>
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600">
+                      Duplicates:
+                      <span className="font-medium text-orange-600">
+                        {predictedCount.duplicates}
+                      </span>
+                    </span>
+                  </li>
+
+                  <li className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600">
+                      Originals:
+                      <span className="font-medium text-orange-600">
+                        {predictedCount.originals}
+                      </span>
+                    </span>
+                  </li>
+                </ul>
+                <button
+                  onClick={handleDownload}
+                  className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+                >
+                  Download Predictions
+                </button>
               </div>
             )}
           </div>
-
+          {isLoading && (
+            <div className="spinner-border animate-spin w-6 h-6 border-4 border-t-4 border-white rounded-full"></div>
+          )}
           {/* Camera Preview */}
           {isCameraOn && (
             <div className="mt-6 text-center">
@@ -429,4 +475,4 @@ const Attendance = () => {
   );
 };
 
-export default Attendance;
+export default Doubleattendance;

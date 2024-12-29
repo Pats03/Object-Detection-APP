@@ -12,7 +12,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'https://5a19-124-123-171-114.ngrok-free.app/auth/login',
+        'http://127.0.0.1:5173/auth/login',
         {
           email,
           password,
