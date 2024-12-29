@@ -75,24 +75,28 @@ const Doubleattendance = () => {
     setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
   const handlePredict = async () => {
+    const formData = new FormData();
+    const response = await fetch(stitchedImage);
+    const blob = await response.blob();
+    formData.append('stitched_image', blob);
     try {
       // Send the stitched image URL to the predict route
-      
+
       setIsLoading(true);
       const predictionResponse = await axios.post(
         'http://127.0.0.1:5173/predict',
+        formData,
         {
-          url: stitchedImage,
+          headers: { 'Content-Type': 'multipart/form-data' },
         }
       );
 
       // Set the prediction state
-      
-    setIsLoading(false);
+
+      setIsLoading(false);
       setPredictedCount(predictionResponse.data);
     } catch (error) {
-        
-     setIsLoading(false);
+      setIsLoading(false);
       console.error('Error predicting count:', error);
     }
   };
@@ -181,19 +185,18 @@ const Doubleattendance = () => {
         'http://127.0.0.1:5173/image/stitch',
         formData,
         {
-          headers: { 'Content-Type': 'multipart/form-data' },
+          responseType: 'blob',
         }
       );
       console.log(response.data);
 
       // Store the stitched image URL from the response
-      setStitchedImage(response.data.image_url);
-      
-     setIsLoading(false);
-      setUploadedImages([]);
+      setStitchedImage(URL.createObjectURL(response.data));
 
+      setUploadedImages([]);
     } catch (error) {
       console.error('Error stitching images:', error);
+      setIsLoading(false);
     }
   };
   const handleDownload = () => {
@@ -230,7 +233,6 @@ const Doubleattendance = () => {
     // Clean up
     URL.revokeObjectURL(url);
   };
-
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
