@@ -53,20 +53,20 @@
   gap: 10px; /* Add spacing between buttons */
 }
 
-.navbar-right button {
-  background-color: #0e1a27;
+/* .navbar-right button { */
+  /* background-color: #0e1a27;
   color: white;
   border: none;
   padding: 8px 15px;
   border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem; /* Adjusted font size to fit the navbar */
-  transition: background-color 0.3s ease;
-}
+  cursor: pointer; */
+  /* font-size: 0.9rem; Adjusted font size to fit the navbar */
+  /* transition: background-color 0.3s ease; */
+/* } */
 
-.navbar-right button:hover {
+/* .navbar-right button:hover {
   background-color: #3abf27;
-}
+} */
 
 /* Sidebar Styling */
 .sidebar {
@@ -125,7 +125,7 @@
   gap: 10px;
   margin-top: 20px;
   justify-items: center; /* Centers the images inside their grid items */
-  padding: 0 10px; /* Prevents images from touching the container’s edges */
+  padding: 0 20px; /* Prevents images from touching the container’s edges */
 }
 
 /* Image Wrapper */
@@ -141,10 +141,10 @@
 }
 
 /* Hover Effect on Image Wrapper */
-.image-wrapper:hover {
+/* .image-wrapper:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-}
+} */
 
 /* Gallery Image */
 .gallery-image {

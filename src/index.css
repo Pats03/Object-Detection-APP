@@ -13,6 +13,54 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.typing-effect {
+  font-size: 2.5rem; /* Adjust font size */
+  font-weight: 900; /* Heavy and dominating font weight */
+  color: white; /* White color for the rest of the text */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide text that isn't revealed yet */
+  width: 0; /* Start with no width */
+  animation: typing 4s steps(40) 1s forwards, blink-caret 0.75s step-end infinite, compress 1s 5s forwards, expand 1s 7s forwards;
+}
+
+.vibrant-text {
+  color: #FF6347; /* Vibrant color for the first letters */
+  display: inline-block; /* Make sure they stay inline and don't break */
+}
+
+@keyframes typing {
+  to {
+    width: 95%; /* Reveal the entire text */
+  }
+}
+
+@keyframes blink-caret {
+  50% {
+    border-color: transparent; /* Make the caret blink */
+  }
+  100% {
+    border-color: transparent; /* Hide the cursor after typing is done */
+  }
+}
+
+
+
+.typing-effect span {
+  visibility: hidden; /* Hide the letters that are not vibrant */
+}
+
+.typing-effect span.vibrant-text {
+  visibility: visible; /* Make vibrant letters visible */
+}
+
+/* New addition: After typing ends, remove the cursor */
+.typing-effect.typing-done {
+  animation: typing 4s steps(40) 1s forwards, blink-caret 0.75s step-end 1, compress 1s 5s forwards, expand 1s 7s forwards;
+  border-right: none; /* Remove the cursor after typing ends */
+}
+
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

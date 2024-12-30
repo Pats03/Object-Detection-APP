@@ -237,17 +237,17 @@ const Doubleattendance = () => {
   return (
     <div className="bg-gray-900 text-white min-h-screen">
       {/* Header */}
-      <header className="p-6 text-center">
+      {/* <header className="p-6 text-center">
         <h1 className="text-3xl font-bold">
           Computer Vision AI{' '}
           <span className="text-orange-400">Object Detection</span>
         </h1>
-      </header>
+      </header> */}
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto p-6">
         {/* Discover and Docs Section */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        {/* <div className="grid grid-cols-2 gap-4 mb-8">
           <button
             className="bg-teal-700 hover:bg-teal-600 px-6 py-3 rounded text-white font-semibold"
             onClick={() =>
@@ -262,7 +262,7 @@ const Doubleattendance = () => {
           >
             View API Documentation
           </button>
-        </div>
+        </div> */}
 
         {/* Object Detection Demonstration Section */}
         <div className="bg-gray-800 p-6 rounded-lg shadow-md">
@@ -330,10 +330,10 @@ const Doubleattendance = () => {
           </div>
           {/* Photo and Actions Table */}
           <div className="bg-gray-700 p-4 rounded-lg">
-            <div className="flex justify-between items-center mb-4">
+            {/* <div className="flex justify-between items-center mb-4">
               <span className="font-semibold">PHOTO</span>
               <span className="font-semibold">ACTION</span>
-            </div>
+            </div> */}
             {uploadedImages.length > 0 ? (
               <div className="grid grid-cols-3 gap-4">
                 {uploadedImages.map((image, index) => (
@@ -452,7 +452,7 @@ const Doubleattendance = () => {
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">Vision AI Examples</h2>
           <p className="text-gray-300 mb-4">
-            Browse a subset of randomly selected set of asticaVision outputs.
+            Browse a subset of randomly selected set of outputs.
           </p>
           {/* Example Images */}
           <div className="grid grid-cols-4 gap-4">
