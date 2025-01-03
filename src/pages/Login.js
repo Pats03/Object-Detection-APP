@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -23,46 +23,46 @@ const Login = () => {
           },
         }
       );
-      setMessage(response.data.message || 'Login successful!'); // Display success message
+      setMessage(response.data.message || 'Login successful!');
       navigate('/attendance'); // Redirect to attendance page on success
     } catch (error) {
-      setMessage(error.response?.data?.error || 'Invalid credentials'); // Display error message
+      setMessage(error.response?.data?.error || 'Invalid credentials');
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen w-full bg-cover bg-center bg-fixed bg-[url('./assets/dl.jpeg')]">
-      <div className="bg-[#0E1A28] p-8 rounded-lg shadow-lg max-w-sm w-full">
-        <h2 className="text-center text-[#f8f4f4] mb-6 text-2xl">Login</h2>
+    <div className="flex justify-center items-center h-screen w-full bg-gray-900 text-white">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-sm w-full hover:border hover:border-blue-300">
+        <h2 className="text-center text-gray-100 mb-6 text-2xl font-bold">Login</h2>
         <form onSubmit={handleSubmit} className="flex flex-col">
-          <label className="mb-2 text-[#f8f4f4] text-sm">Email</label>
+          <label className="mb-2 text-gray-300 text-sm">Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
             required
-            className="p-3 mb-4 border border-[#1f1e1e] rounded-md text-sm focus:outline-none focus:border-[#4a90e2] focus:ring-1 focus:ring-[#4a90e2]"
+            className="p-3 mb-4 border border-gray-600 rounded-md text-sm bg-gray-700 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
-          <label className="mb-2 text-[#f8f4f4] text-sm">Password</label>
+          <label className="mb-2 text-gray-300 text-sm">Password</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             required
-            className="p-3 mb-6 border border-[#1f1e1e] rounded-md text-sm focus:outline-none focus:border-[#4a90e2] focus:ring-1 focus:ring-[#4a90e2]"
+            className="p-3 mb-6 border border-gray-600 rounded-md text-sm bg-gray-700 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
           <button
             type="submit"
-            className="p-3 bg-[#4a90e2] text-white rounded-md text-lg cursor-pointer hover:bg-[#357ab8]"
+            className="p-3 bg-blue-600 text-white rounded-md text-lg cursor-pointer hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Login
           </button>
         </form>
-        <p className="text-center text-sm text-[#f8f4f4] mt-4">
+        <p className="text-center text-sm text-gray-400 mt-4">
           Don't have an account?{' '}
-          <Link to="/signup" className="text-[#4a90e2] hover:underline">
+          <Link to="/signup" className="text-blue-400 hover:underline">
             Sign Up
           </Link>
         </p>
