@@ -88,21 +88,12 @@ const Attendance = () => {
   const handlesubmitImage = async (index) => {
     setIsLoading(true); // Start loading state
     setPredictedCount(null); // Reset predicted count
-  const handlesubmitImage = async (index) => {
-    setIsLoading(true); // Start loading state
-    setPredictedCount(null); // Reset predicted count
 
     try {
       // Step 1: Retrieve the image blob from uploadedImages1
       const imageBlob = uploadedImages1[index];
       if (!imageBlob) throw new Error('No image found at the specified index.');
-    try {
-      // Step 1: Retrieve the image blob from uploadedImages1
-      const imageBlob = uploadedImages1[index];
-      if (!imageBlob) throw new Error('No image found at the specified index.');
 
-      // Step 2: Convert the Blob to FormData
-      const formData = blobToFormData(imageBlob, index);
       // Step 2: Convert the Blob to FormData
       const formData = blobToFormData(imageBlob, index);
 
@@ -116,31 +107,7 @@ const Attendance = () => {
           },
         }
       );
-      // Step 3: Send the image directly to your backend
-      const backendResponse = await axios.post(
-        'http://127.0.0.1:5173/model/predict', // Replace with your backend API endpoint
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
 
-      // Log and display the backend response
-      console.log('Backend Response:', backendResponse.data);
-      setPredictedCount(backendResponse.data.predicted_count);
-    } catch (error) {
-      // Handle errors gracefully
-      console.error(
-        'Error submitting image:',
-        error.response ? error.response.data : error.message
-      );
-      alert('Failed to submit the image. Please try again.');
-    } finally {
-      setIsLoading(false); // Stop loading state
-    }
-  };
       // Log and display the backend response
       console.log('Backend Response:', backendResponse.data);
       setPredictedCount(backendResponse.data.predicted_count);
