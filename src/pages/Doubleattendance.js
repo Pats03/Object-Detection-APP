@@ -15,6 +15,8 @@ const Doubleattendance = () => {
   const [isLoading, setIsLoading] = useState(false); // Track loading state
   const [predictedCount, setPredictedCount] = useState(null); // Track predicted count
   const [stitchedImage, setStitchedImage] = useState(null);
+  const [isstich, isstichImage] = useState(false);
+  const [ispredict, ispredictImage] = useState(false);
 
   // Handle image upload
   const handleUpload = (event) => {
@@ -83,6 +85,7 @@ const Doubleattendance = () => {
       // Send the stitched image URL to the predict route
 
       setIsLoading(true);
+      ispredictImage(true);
       const predictionResponse = await axios.post(
         'http://127.0.0.1:5173/predict',
         formData,
@@ -94,10 +97,14 @@ const Doubleattendance = () => {
       // Set the prediction state
 
       setIsLoading(false);
+      ispredictImage(false);
       setPredictedCount(predictionResponse.data);
+      
     } catch (error) {
       setIsLoading(false);
       console.error('Error predicting count:', error);
+      // Trigger an error toast
+     
     }
   };
 
@@ -174,6 +181,7 @@ const Doubleattendance = () => {
       console.error('Exactly two images are required to stitch.');
       return;
     }
+    isstichImage(true);
     setIsLoading(true);
 
     const formData = new FormData();
@@ -192,7 +200,7 @@ const Doubleattendance = () => {
 
       // Store the stitched image URL from the response
       setStitchedImage(URL.createObjectURL(response.data));
-
+      setIsLoading(false);
       setUploadedImages([]);
     } catch (error) {
       console.error('Error stitching images:', error);
@@ -245,6 +253,7 @@ const Doubleattendance = () => {
       </header> */}
 
       {/* Main Content */}
+
       <main className="max-w-5xl mx-auto p-6">
         {/* Discover and Docs Section */}
         {/* <div className="grid grid-cols-2 gap-4 mb-8">
@@ -363,12 +372,21 @@ const Doubleattendance = () => {
             )}
             {uploadedImages.length === 2 && (
               <div className="mt-4 text-center">
-                <button
-                  className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded text-white"
-                  onClick={handleStitch}
-                >
-                  Stitch Images
-                </button>
+                {isstich ? (
+                  <button
+                    className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded text-white"
+                    onClick={handleStitch}
+                  >
+                    Stitching....
+                  </button>
+                ) : (
+                  <button
+                    className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded text-white"
+                    onClick={handleStitch}
+                  >
+                    Stitch Images
+                  </button>
+                )}
               </div>
             )}
             {stitchedImage && (
@@ -378,12 +396,21 @@ const Doubleattendance = () => {
                   alt="Stitched Result"
                   className="w-full max-w-md mx-auto rounded-lg"
                 />
-                <button
-                  className="bg-blue-600 hover:bg-blue-500 px-4 py-2 mt-4 rounded text-white"
-                  onClick={handlePredict}
-                >
-                  Predict
-                </button>
+                {ispredict ? (
+                  <button
+                    className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded text-white"
+                    onClick={handlePredict}
+                  >
+                    Predicting...
+                  </button>
+                ) : (
+                  <button
+                    className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded text-white"
+                    onClick={handlePredict}
+                  >
+                    Predict
+                  </button>
+                )}
               </div>
             )}
 
