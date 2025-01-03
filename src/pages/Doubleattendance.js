@@ -94,6 +94,7 @@ const Doubleattendance = () => {
     formData.append('stitched_image', blob);
     try {
       setIsLoading(true);
+      ispredictImage(true);
       const predictionResponse = await axios.post(
         'http://127.0.0.1:5173/predict',
         formData,
@@ -103,7 +104,9 @@ const Doubleattendance = () => {
       );
 
       setIsLoading(false);
+      ispredictImage(false);
       setPredictedCount(predictionResponse.data);
+      
     } catch (error) {
       setIsLoading(false);
       console.error('Error predicting count:', error);
@@ -167,6 +170,7 @@ const Doubleattendance = () => {
       console.error('Exactly two images are required to stitch.');
       return;
     }
+    isstichImage(true);
     setIsLoading(true);
 
     const formData = new FormData();

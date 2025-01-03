@@ -21,6 +21,7 @@ const Attendance = () => {
     setUploadedImages1((prevImages) => [...prevImages, ...files]);
     const imagePreviews = files.map((file) => URL.createObjectURL(file));
     setUploadedImages((prevImages) => [...prevImages, ...imagePreviews]);
+    setPredictedCount(null); // Reset the predicted count
   };
 
   // Handle "Upload Directory" (advanced functionality)
@@ -72,6 +73,10 @@ const Attendance = () => {
   // Handle deleting an uploaded image
   const handleDeleteImage = (index) => {
     setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setUploadedImages1((prevImages) =>
+      prevImages.filter((_, i) => i !== index)
+    ); // Ensure the same index is removed from both arrays
+    setPredictedCount(null); // Reset the predicted count
   };
 
   const blobToFormData = (blob, index) => {
@@ -83,12 +88,21 @@ const Attendance = () => {
   const handlesubmitImage = async (index) => {
     setIsLoading(true); // Start loading state
     setPredictedCount(null); // Reset predicted count
+  const handlesubmitImage = async (index) => {
+    setIsLoading(true); // Start loading state
+    setPredictedCount(null); // Reset predicted count
 
     try {
       // Step 1: Retrieve the image blob from uploadedImages1
       const imageBlob = uploadedImages1[index];
       if (!imageBlob) throw new Error('No image found at the specified index.');
+    try {
+      // Step 1: Retrieve the image blob from uploadedImages1
+      const imageBlob = uploadedImages1[index];
+      if (!imageBlob) throw new Error('No image found at the specified index.');
 
+      // Step 2: Convert the Blob to FormData
+      const formData = blobToFormData(imageBlob, index);
       // Step 2: Convert the Blob to FormData
       const formData = blobToFormData(imageBlob, index);
 
@@ -102,7 +116,31 @@ const Attendance = () => {
           },
         }
       );
+      // Step 3: Send the image directly to your backend
+      const backendResponse = await axios.post(
+        'http://127.0.0.1:5173/model/predict', // Replace with your backend API endpoint
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
+      // Log and display the backend response
+      console.log('Backend Response:', backendResponse.data);
+      setPredictedCount(backendResponse.data.predicted_count);
+    } catch (error) {
+      // Handle errors gracefully
+      console.error(
+        'Error submitting image:',
+        error.response ? error.response.data : error.message
+      );
+      alert('Failed to submit the image. Please try again.');
+    } finally {
+      setIsLoading(false); // Stop loading state
+    }
+  };
       // Log and display the backend response
       console.log('Backend Response:', backendResponse.data);
       setPredictedCount(backendResponse.data.predicted_count);
@@ -294,7 +332,7 @@ const Attendance = () => {
                     {predictedCount !== null && !isLoading && (
                       <div className="mt-4 text-center">
                         <p className="text-xl font-semibold text-green-500">
-                          Predicted Count: {predictedCount}
+                          Predicted Count: {Math.round(predictedCount)}
                         </p>
                         <button
                           onClick={handleDownload}
