@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './SignUp.css'; // Importing the CSS file for styling
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -26,59 +25,72 @@ const Signup = () => {
           },
         }
       );
-      setMessage(response.data.message || 'Sign Up successful!'); // Display success message
+      setMessage(response.data.message || 'Sign Up successful!');
       navigate('/attendance'); // Redirect to home page on success
     } catch (error) {
-      setMessage(error.response?.data?.error || 'Error signing up'); // Display error message
+      setMessage(error.response?.data?.error || 'Error signing up');
     }
   };
 
   return (
-    <div className="signup-wrapper">
-      <div className="signup-container">
-        <h2 className="signup-header">Sign Up</h2>
-        <form onSubmit={handleSubmit} className="signup-form">
-          <input
-            type="text"
-            className="signup-input"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Name"
-            required
-          />
-          <input
-            type="email"
-            className="signup-input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-          />
-          <input
-            type="password"
-            className="signup-input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-          />
+    <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+      <div className="w-full max-w-md bg-gray-800 p-8 rounded-lg shadow-lg focus:outline-none hover:border hover:border-blue-300">
+        <h2 className="text-2xl font-bold text-center text-gray-100 mb-6">Sign Up</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <input
+              type="text"
+              className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Name"
+              required
+            />
+          </div>
 
-          <button type="submit" className="signup-button">
+          <div className="mb-4">
+            <input
+              type="email"
+              className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <input
+              type="password"
+              className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             Sign Up
           </button>
         </form>
+
         {message && (
           <p
-            className={`message mt-4 text-center ${
-              message.includes('successful') ? 'text-green-500' : 'text-red-500'
+            className={`mt-4 text-center ${
+              message.includes('successful') ? 'text-green-400' : 'text-red-400'
             }`}
           >
             {message}
           </p>
         )}
-        <p className="signup-footer">
+
+        <p className="mt-4 text-center text-gray-400">
           Already have an account?{' '}
-          <Link to="/login" className="signup-link">
+          <Link to="/login" className="text-blue-400 hover:text-blue-500">
             Login
           </Link>
         </p>

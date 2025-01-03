@@ -1,16 +1,19 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate hook for navigation
 import img1 from '../assets/img4.jpeg';
 
 const Attendance = () => {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [sampleImages, setSampleImages] = useState([]);
+  const [showSampleImages, setShowSampleImages] = useState(false); // State for toggling visibility
   const videoRef = useRef(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [cctvUrl, setCctvUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Track loading state
   const [predictedCount, setPredictedCount] = useState(null); // Track predicted count
   const [uploadedImages1, setUploadedImages1] = useState([]);
+  const navigate = useNavigate(); // Initialize navigate for navigation
 
   // Handle image upload
   const handleUpload = (event) => {
@@ -75,6 +78,7 @@ const Attendance = () => {
     ); // Ensure the same index is removed from both arrays
     setPredictedCount(null); // Reset the predicted count
   };
+
   const blobToFormData = (blob, index) => {
     const formData = new FormData();
     formData.append('image', blob, `image_${index + 1}.jpg`); // Attach the image Blob with a name
@@ -123,6 +127,12 @@ const Attendance = () => {
   const handleLoadSampleImages = () => {
     const exampleImages = [img1];
     setSampleImages(exampleImages);
+    setShowSampleImages(true); // Show the sample images when button is clicked
+  };
+
+  // Toggle the visibility of the sample images
+  const toggleSampleImages = () => {
+    setShowSampleImages(!showSampleImages); // Toggle visibility
   };
 
   // Extract an image from a CCTV URL
@@ -165,6 +175,7 @@ const Attendance = () => {
       );
     }
   };
+
   const handleDownload = () => {
     const content = `
     <h2>Nethra</h2>
@@ -202,49 +213,19 @@ const Attendance = () => {
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
-      {/* Header */}
-      {/* <header className="p-6 text-center">
-        <h1 className="text-3xl font-bold">
-          Computer Vision AI{' '}
-          <span className="text-orange-400">Object Detection</span>
-        </h1>
-      </header> */}
-
-      {/* Main Content */}
       <main className="max-w-5xl mx-auto p-6">
-        {/* Discover and Docs Section */}
-        {/* <div className="grid grid-cols-2 gap-4 mb-8">
-          <button
-            className="bg-teal-700 hover:bg-teal-600 px-6 py-3 rounded text-white font-semibold"
-            onClick={() =>
-              alert('Discover asticaVision functionality coming soon.')
-            }
-          >
-            Discover asticaVision
-          </button>
-          <button
-            className="bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded text-white font-semibold"
-            onClick={() => window.open('https://docs.example.com', '_blank')}
-          >
-            View API Documentation
-          </button>
-        </div> */}
-
-        {/* Object Detection Demonstration Section */}
         <div className="bg-gray-800 p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">
             Object Detection Demonstration
           </h2>
           <p className="text-gray-300 mb-6">
             This tool demonstrates object detection capabilities. Upload an
-            image, select a directory, take a photo, or fetch an image from a
-            CCTV URL.
+            image, select a directory or fetch an image from a CCTV URL.
           </p>
 
-          {/* Upload Buttons */}
           <div className="flex gap-4 mb-6">
-            <label className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded text-white cursor-pointer">
-              + Upload Image(s)
+            <label className="hover:text-green-400 bg-green-600 border-green-600 hover:shadow font-bold hover:shadow-green-400 text-white px-4 py-2 rounded hover:bg-transparent border hover:border-green-600 cursor-pointer">
+              Upload Image
               <input
                 type="file"
                 accept="image/*"
@@ -253,7 +234,7 @@ const Attendance = () => {
                 className="hidden"
               />
             </label>
-            <label className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-white cursor-pointer">
+            <label className="hover:text-blue-400 bg-blue-600 border-blue-600 hover:shadow font-bold hover:shadow-blue-400 text-white px-4 py-2 rounded hover:bg-transparent border hover:border-blue-600 cursor-pointer">
               Upload Directory
               <input
                 type="file"
@@ -266,7 +247,6 @@ const Attendance = () => {
             </label>
           </div>
 
-          {/* CCTV URL Input */}
           <div className="flex gap-4 mb-6">
             <input
               type="text"
@@ -276,19 +256,14 @@ const Attendance = () => {
               onChange={(e) => setCctvUrl(e.target.value)}
             />
             <button
-              className="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded text-white"
+              className="hover:text-orange-400 bg-orange-600 border-orange-600 hover:shadow font-bold hover:shadow-orange-400 text-white px-4 py-2 rounded hover:bg-transparent border hover:border-orange-600 cursor-pointer"
               onClick={handleCCTVUrl}
             >
               Fetch Image
             </button>
           </div>
 
-          {/* Photo and Actions Table */}
           <div className="bg-gray-700 p-4 rounded-lg">
-            {/* <div className="flex justify-between items-center mb-4">
-              <span className="font-semibold">PHOTO</span>
-              <span className="font-semibold">ACTION</span>
-            </div> */}
             {uploadedImages.length > 0 ? (
               <div className="grid grid-cols-3 gap-4">
                 {uploadedImages.map((image, index) => (
@@ -300,17 +275,19 @@ const Attendance = () => {
                     />
                     <div className="flex gap-4 mt-2">
                       {isLoading ? (
-                        <div className="spinner-border animate-spin w-6 h-6 border-4 border-t-4 border-white rounded-full"></div>
+                        <div className="hover:text-blue-400 flex items-center justify-center mx-auto bg-blue-400 border-blue-600 hover:shadow font-bold hover:shadow-blue-400 text-white px-4 py-2 rounded hover:bg-transparent border hover:border-blue-600 cursor-pointer">
+                          Submitting
+                        </div>
                       ) : (
                         <>
                           <button
-                            className="bg-red-600 hover:bg-red-500 px-4 py-2 mt-2 rounded text-white"
+                            className="hover:text-red-400 bg-red-600 border-red-600 hover:shadow font-bold hover:shadow-red-400 text-white px-4 py-2 rounded hover:bg-transparent border hover:border-red-600 cursor-pointer"
                             onClick={() => handleDeleteImage(index)}
                           >
                             Delete
                           </button>
                           <button
-                            className="bg-blue-600 hover:bg-blue-500 px-4 py-2 mt-2 rounded text-white"
+                            className="hover:text-blue-400 bg-blue-600 border-blue-600 hover:shadow font-bold hover:shadow-blue-400 text-white px-4 py-2 rounded hover:bg-transparent border hover:border-blue-600 cursor-pointer"
                             onClick={() => handlesubmitImage(index)}
                           >
                             Submit
@@ -341,46 +318,36 @@ const Attendance = () => {
               </div>
             )}
           </div>
+        </div>
 
-          {/* Camera Preview */}
-          {isCameraOn && (
-            <div className="mt-6 text-center">
-              <video
-                ref={videoRef}
-                className="mx-auto rounded-lg"
-                width="320"
-                height="240"
-              />
-              <button
-                className="bg-green-600 hover:bg-green-500 px-4 py-2 mt-2 rounded text-white"
-                onClick={capturePhoto}
-              >
-                Capture Photo
-              </button>
+        <div className="mt-8">
+          {showSampleImages && (
+            <div className="grid grid-cols-4 gap-4">
+              {sampleImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Example ${index + 1}`}
+                  className="rounded-lg"
+                />
+              ))}
             </div>
           )}
-        </div>
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Vision AI Examples</h2>
-          <p className="text-gray-300 mb-4">
-            Browse a subset of randomly selected set of outputs.
-          </p>
-          {/* Example Images */}
-          <div className="grid grid-cols-4 gap-4">
-            {sampleImages.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`Example ${index + 1}`}
-                className="rounded-lg"
-              />
-            ))}
-          </div>
           <button
-            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 mt-4 rounded text-white"
-            onClick={handleLoadSampleImages}
+            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 mt-4 text-white rounded"
+            onClick={showSampleImages ? toggleSampleImages : handleLoadSampleImages}
           >
-            Load Sample Images
+            {showSampleImages ? 'Hide Images' : 'Load Sample Inputs'}
+          </button>
+        </div>
+
+        {/* Button to navigate to '/doublepic' */}
+        <div className="fixed bottom-4 right-4">
+          <button
+            onClick={() => navigate('/doublepic')} // Navigate to /doublepic using useNavigate
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Go to Double Pic
           </button>
         </div>
       </main>

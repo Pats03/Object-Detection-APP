@@ -29,11 +29,6 @@ const FAQ = () => {
       answer:
         'Once you provide the CCTV camera link, our AI system processes images and detects people in real-time. It works with most modern CCTV cameras.',
     },
-    {
-      question: 'How does the object detection work with CCTV camera links?',
-      answer:
-        'Once you provide the CCTV camera link, our AI system processes images and detects people in real-time. It works with most modern CCTV cameras.',
-    },
   ];
 
   const toggleAnswer = (index) => {
